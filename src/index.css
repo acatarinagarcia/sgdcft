@@ -2,9 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* SGT-CFT Design System */
 
 @layer base {
   :root {
@@ -38,20 +36,29 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
+    /* Portal colors */
+    --medico: 217 91% 60%;
+    --medico-foreground: 0 0% 100%;
+    --farmacia: 142 71% 45%;
+    --farmacia-foreground: 0 0% 100%;
+    --cft: 271 81% 56%;
+    --cft-foreground: 0 0% 100%;
+
+    /* Status colors */
+    --status-submetido: 217 91% 60%;
+    --status-triagem: 38 92% 50%;
+    --status-agenda: 271 81% 56%;
+    --status-aprovado: 142 71% 45%;
+    --status-rejeitado: 0 84% 60%;
+    --status-pendente: 38 92% 50%;
+
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -59,7 +66,7 @@ All colors MUST be HSL.
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 217 33% 10%;
     --card-foreground: 210 40% 98%;
 
     --popover: 222.2 84% 4.9%;
@@ -83,6 +90,7 @@ All colors MUST be HSL.
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -101,5 +109,28 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer utilities {
+  .gradient-dark {
+    background: linear-gradient(135deg, hsl(222.2 84% 4.9%) 0%, hsl(217 33% 15%) 100%);
+  }
+
+  .gradient-medico {
+    background: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(217 91% 50%) 100%);
+  }
+
+  .gradient-farmacia {
+    background: linear-gradient(135deg, hsl(142 71% 45%) 0%, hsl(142 71% 35%) 100%);
+  }
+
+  .gradient-cft {
+    background: linear-gradient(135deg, hsl(271 81% 56%) 0%, hsl(271 81% 46%) 100%);
   }
 }
