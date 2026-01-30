@@ -70,10 +70,10 @@ export interface ReuniaoCFT {
 }
 
 export const reunioesCFT: ReuniaoCFT[] = [
-  { id: 'cft-1', data: new Date(2025, 1, 5), hora: '14:00', estado: 'agendada' },
-  { id: 'cft-2', data: new Date(2025, 1, 19), hora: '14:00', estado: 'agendada' },
-  { id: 'cft-3', data: new Date(2025, 2, 5), hora: '14:00', estado: 'agendada' },
-  { id: 'cft-4', data: new Date(2025, 2, 19), hora: '14:00', estado: 'agendada' },
+  { id: 'cft-1', data: new Date(2026, 1, 3), hora: '14:00', estado: 'agendada' },
+  { id: 'cft-2', data: new Date(2026, 1, 17), hora: '14:00', estado: 'agendada' },
+  { id: 'cft-3', data: new Date(2026, 2, 3), hora: '14:00', estado: 'agendada' },
+  { id: 'cft-4', data: new Date(2026, 2, 17), hora: '14:00', estado: 'agendada' },
 ];
 
 // Interface do Pedido
