@@ -48,7 +48,7 @@ export default function PortalCFT() {
   const pedidosReuniao = reuniaoSelecionada ? getPedidosByReuniao(reuniaoSelecionada.id) : [];
 
   // Impacto total da reunião
-  const impactoReuniao = pedidosReuniao.reduce((acc, p) => acc + p.impacto.custoTotal, 0);
+  const impactoReuniao = pedidosReuniao.reduce((acc, p) => acc + (p.impacto?.custoTotal || 0), 0);
 
   const handleAbrirDeliberacao = (pedido: Pedido) => {
     setPedidoDeliberacao(pedido);
@@ -339,30 +339,32 @@ function PedidoAgendaCard({ pedido, numero, onDeliberar }: { pedido: Pedido; num
             <User className="h-4 w-4 text-muted-foreground mt-0.5" />
             <div>
               <p className="text-muted-foreground">Doente</p>
-              <p>{pedido.doente.iniciais} • {pedido.doente.idade}A • ECOG {pedido.doente.ecog}</p>
+              <p>{pedido.doente.ndDoente || pedido.doente.iniciais} • ECOG {pedido.doente.ecog}</p>
             </div>
           </div>
           <div className="flex items-start gap-2">
             <Pill className="h-4 w-4 text-muted-foreground mt-0.5" />
             <div>
-              <p className="text-muted-foreground">Medicamento</p>
-              <p>{farmaco?.nome} {pedido.dosagem}</p>
+              <p className="text-muted-foreground">Terapêutica Proposta</p>
+              <p>{pedido.terapeuticaProposta || (farmaco?.nome ? `${farmaco.nome} ${pedido.dosagem || ''}` : '-')}</p>
             </div>
           </div>
         </div>
 
         <div className="mt-3 p-3 rounded bg-muted/50">
-          <p className="text-sm text-muted-foreground mb-1">Diagnóstico</p>
-          <p className="text-sm">{pedido.doente.diagnostico}</p>
+          <p className="text-sm text-muted-foreground mb-1">Indicação</p>
+          <p className="text-sm">{pedido.doente.indicacaoTerapeutica || pedido.doente.diagnostico}</p>
         </div>
 
         <div className="mt-3 flex items-center justify-between text-sm">
           <span className="text-muted-foreground">
-            {servico?.nome} • {pedido.medico}
+            {servico?.nome} • {pedido.medicoNomeCompleto || pedido.medico}
           </span>
-          <span className="font-semibold text-purple-600">
-            {new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(pedido.impacto.custoTotal)}
-          </span>
+          {pedido.impacto && (
+            <span className="font-semibold text-purple-600">
+              {new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(pedido.impacto.custoTotal)}
+            </span>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -400,19 +402,25 @@ function PedidoHistoricoCard({ pedido }: { pedido: Pedido }) {
         <div className="mt-4 grid sm:grid-cols-3 gap-4 text-sm">
           <div>
             <p className="text-muted-foreground">Doente</p>
-            <p>{pedido.doente.iniciais} • {pedido.doente.diagnostico}</p>
+            <p>{pedido.doente.ndDoente || pedido.doente.iniciais}</p>
           </div>
           <div>
-            <p className="text-muted-foreground">Medicamento</p>
-            <p>{farmaco?.nome}</p>
+            <p className="text-muted-foreground">Indicação</p>
+            <p>{pedido.doente.indicacaoTerapeutica || pedido.doente.diagnostico}</p>
           </div>
           <div>
-            <p className="text-muted-foreground">Impacto</p>
-            <p className="font-semibold">
-              {new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(pedido.impacto.custoTotal)}
-            </p>
+            <p className="text-muted-foreground">Terapêutica</p>
+            <p>{pedido.terapeuticaProposta || farmaco?.nome}</p>
           </div>
         </div>
+        {pedido.impacto && (
+          <div className="mt-3 pt-3 border-t">
+            <span className="text-sm text-muted-foreground">Impacto: </span>
+            <span className="font-semibold">
+              {new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(pedido.impacto.custoTotal)}
+            </span>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

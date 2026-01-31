@@ -121,7 +121,7 @@ export function PedidosProvider({ children }: { children: React.ReactNode }) {
     const taxaAprovacao = deliberados > 0 ? (aprovados / deliberados) * 100 : 0;
     const impactoTotal = pedidos
       .filter(p => p.estado === 'aprovado')
-      .reduce((acc, p) => acc + p.impacto.custoTotal, 0);
+      .reduce((acc, p) => acc + (p.impacto?.custoTotal || 0), 0);
 
     return { total, emTriagem, emAgenda, aprovados, taxaAprovacao, impactoTotal };
   }, [pedidos]);
