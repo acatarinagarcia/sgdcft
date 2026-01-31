@@ -257,15 +257,17 @@ function PedidoTriagemCard({ pedido, onIniciarTriagem, onAgendar, onPedirInfo, o
             </div>
             <CardDescription className="flex items-center gap-2">
               <Clock className="h-3 w-3" />
-              Submetido em {format(pedido.dataSubmissao, "d 'de' MMMM", { locale: pt })} por {pedido.medico}
+              Submetido em {format(pedido.dataSubmissao, "d 'de' MMMM", { locale: pt })} por {pedido.medicoNomeCompleto || pedido.medico}
             </CardDescription>
           </div>
-          <div className="text-right">
-            <p className="font-semibold text-green-600 text-lg">
-              {new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(pedido.impacto.custoTotal)}
-            </p>
-            <p className="text-sm text-muted-foreground">{pedido.duracaoMeses} meses</p>
-          </div>
+          {pedido.impacto && (
+            <div className="text-right">
+              <p className="font-semibold text-green-600 text-lg">
+                {new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(pedido.impacto.custoTotal)}
+              </p>
+              <p className="text-sm text-muted-foreground">{pedido.duracaoMeses || '-'} meses</p>
+            </div>
+          )}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -275,14 +277,18 @@ function PedidoTriagemCard({ pedido, onIniciarTriagem, onAgendar, onPedirInfo, o
             <User className="h-4 w-4 text-muted-foreground mt-0.5" />
             <div>
               <p className="text-muted-foreground">Doente</p>
-              <p className="font-medium">{pedido.doente.iniciais} • {pedido.doente.idade}A • {pedido.doente.peso}kg • ECOG {pedido.doente.ecog}</p>
+              <p className="font-medium">
+                {pedido.doente.ndDoente || pedido.doente.iniciais} • {pedido.doente.peso}kg • ECOG {pedido.doente.ecog}
+              </p>
             </div>
           </div>
           <div className="flex items-start gap-2">
             <Pill className="h-4 w-4 text-muted-foreground mt-0.5" />
             <div>
-              <p className="text-muted-foreground">Medicamento</p>
-              <p className="font-medium">{farmaco?.nome} {pedido.dosagem} {pedido.posologia}</p>
+              <p className="text-muted-foreground">Terapêutica Proposta</p>
+              <p className="font-medium">
+                {pedido.terapeuticaProposta || (farmaco?.nome ? `${farmaco.nome} ${pedido.dosagem || ''} ${pedido.posologia || ''}` : '-')}
+              </p>
             </div>
           </div>
           <div className="flex items-start gap-2">
@@ -292,26 +298,28 @@ function PedidoTriagemCard({ pedido, onIniciarTriagem, onAgendar, onPedirInfo, o
               <p className="font-medium">{servico?.nome}</p>
             </div>
           </div>
-          <div className="flex items-start gap-2">
-            <Euro className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <div>
-              <p className="text-muted-foreground">Impacto Mensal</p>
-              <p className="font-medium">
-                {new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(pedido.impacto.custoMensal)}
-              </p>
+          {pedido.impacto && (
+            <div className="flex items-start gap-2">
+              <Euro className="h-4 w-4 text-muted-foreground mt-0.5" />
+              <div>
+                <p className="text-muted-foreground">Impacto Mensal</p>
+                <p className="font-medium">
+                  {new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(pedido.impacto.custoMensal)}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Diagnóstico e Justificação */}
+        {/* Indicação e Resumo Clínico */}
         <div className="p-4 rounded-lg bg-muted/50 space-y-3">
           <div>
-            <p className="text-sm font-medium text-muted-foreground">Diagnóstico</p>
-            <p className="text-sm">{pedido.doente.diagnostico}</p>
+            <p className="text-sm font-medium text-muted-foreground">Indicação Terapêutica</p>
+            <p className="text-sm">{pedido.doente.indicacaoTerapeutica || pedido.doente.diagnostico}</p>
           </div>
           <div>
-            <p className="text-sm font-medium text-muted-foreground">Justificação Clínica</p>
-            <p className="text-sm">{pedido.justificacao}</p>
+            <p className="text-sm font-medium text-muted-foreground">Resumo Clínico</p>
+            <p className="text-sm">{pedido.resumoClinico || pedido.justificacao}</p>
           </div>
         </div>
 

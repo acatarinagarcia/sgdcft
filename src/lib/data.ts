@@ -85,40 +85,56 @@ export interface Pedido {
   dataSubmissao: Date;
   dataUltimaAtualizacao: Date;
   
-  // Dados do doente
+  // Identificação do Médico (preenchido pelo médico)
+  medicoNomeCompleto: string;
+  medicoTelemovel: string;
+  emailDiretor: string;
+  
+  // Dados do doente (preenchido pelo médico)
   doente: {
-    iniciais: string;
-    idade: number;
+    ndDoente?: string;
+    iniciais?: string;
+    idade?: number;
     peso: number;
-    ecog: number;
-    diagnostico: string;
+    altura?: number;
+    ecog: number | string;
+    diagnostico?: string;
+    indicacaoTerapeutica?: string;
   };
   
-  // Medicamento
-  farmacoId: string;
-  dosagem: string;
-  posologia: string;
-  duracaoMeses: number;
+  // Dados clínicos (preenchido pelo médico)
+  terapeuticaProposta: string;
+  linhaTratamento?: string;
+  historiaTerapeuticaPrevia?: string;
+  resumoClinico?: string;
+  aprovadoDiretor: string;
   
   // Serviço
   servicoId: string;
-  circuito: string;
-  medico: string;
+  medico?: string; // deprecated, usar medicoNomeCompleto
   
-  // Impacto
-  impacto: {
+  // Dados técnicos (preenchidos pela Farmácia/Secretariado CFT)
+  farmacoId?: string;
+  dosagem?: string;
+  posologia?: string;
+  duracaoMeses?: number;
+  circuito?: string;
+  
+  // Impacto financeiro (calculado pela Farmácia/Secretariado CFT)
+  impacto?: {
     custoMensal: number;
     custoTotal: number;
     custoAteAno: number;
   };
   
-  // Justificação
-  justificacao: string;
+  // Justificação (usado pelo médico no formulário antigo, agora é resumoClinico)
+  justificacao?: string;
   
-  // Triagem
+  // Triagem e Deliberação
   reuniaoCFTId?: string;
   parecerFarmacia?: string;
   decisaoCFT?: 'favoravel' | 'desfavoravel' | 'adiado';
+  fundamentacaoCFT?: string;
   
   // Histórico
   historico: {
@@ -126,6 +142,27 @@ export interface Pedido {
     estado: EstadoPedido;
     observacao?: string;
   }[];
+  
+  // Dados específicos para Introdução no Formulário
+  introducaoFormulario?: {
+    substanciaAtiva: string;
+    marcaComercial?: string;
+    dosagem: string;
+    formaFarmaceutica: string;
+    viaAdministracao: string;
+    indicacoesTerapeuticas: string;
+    indicacoesConstamRCM: string;
+    criteriosPrescricao: string;
+    posologiaDuracao?: string;
+    previsaoTratamentosAnuais: string;
+    terapeuticaAtual?: string;
+    justificacaoIntroducao: string;
+  };
+  
+  // Dados específicos para Protocolo/NOC
+  protocoloNOC?: {
+    nomeProtocolo: string;
+  };
 }
 
 // Dados iniciais de demonstração
@@ -137,7 +174,23 @@ export const pedidosIniciais: Pedido[] = [
     estado: 'submetido',
     dataSubmissao: new Date(2025, 0, 20),
     dataUltimaAtualizacao: new Date(2025, 0, 20),
-    doente: { iniciais: 'JMS', idade: 62, peso: 75, ecog: 1, diagnostico: 'Carcinoma pulmonar de não pequenas células (CPNPC) - Estadio IV' },
+    medicoNomeCompleto: 'Dr. António Silva',
+    medicoTelemovel: '912345678',
+    emailDiretor: 'diretor.oncologia@ulssjoao.min-saude.pt',
+    doente: { 
+      ndDoente: '123456',
+      iniciais: 'JMS', 
+      peso: 75, 
+      altura: 175,
+      ecog: 1, 
+      indicacaoTerapeutica: 'Carcinoma pulmonar de não pequenas células (CPNPC) - Estadio IV',
+      diagnostico: 'Carcinoma pulmonar de não pequenas células (CPNPC) - Estadio IV'
+    },
+    terapeuticaProposta: 'Pembrolizumab',
+    linhaTratamento: '1',
+    historiaTerapeuticaPrevia: 'Sem tratamento prévio para doença metastática',
+    resumoClinico: 'Doente com CPNPC estadio IV, PD-L1 ≥50%, sem mutações EGFR/ALK. Indicação aprovada em 1ª linha. Performance status adequado (ECOG 1).',
+    aprovadoDiretor: 'sim',
     farmacoId: 'pembrolizumab',
     dosagem: '200mg',
     posologia: 'q3w',
@@ -156,7 +209,23 @@ export const pedidosIniciais: Pedido[] = [
     estado: 'em-triagem',
     dataSubmissao: new Date(2025, 0, 18),
     dataUltimaAtualizacao: new Date(2025, 0, 22),
-    doente: { iniciais: 'MFC', idade: 55, peso: 68, ecog: 0, diagnostico: 'Linfoma Não-Hodgkin Folicular - Recidiva' },
+    medicoNomeCompleto: 'Dra. Maria Costa',
+    medicoTelemovel: '913456789',
+    emailDiretor: 'diretor.hematologia@ulssjoao.min-saude.pt',
+    doente: { 
+      ndDoente: '234567',
+      iniciais: 'MFC', 
+      peso: 68, 
+      altura: 165,
+      ecog: 0, 
+      indicacaoTerapeutica: 'Linfoma Não-Hodgkin Folicular - Recidiva - Manutenção',
+      diagnostico: 'Linfoma Não-Hodgkin Folicular - Recidiva'
+    },
+    terapeuticaProposta: 'Rituximab (manutenção)',
+    linhaTratamento: '2',
+    historiaTerapeuticaPrevia: 'R-CHOP x6 ciclos com remissão completa. Recidiva após 18 meses.',
+    resumoClinico: 'Recidiva após 18 meses de remissão completa. Manutenção com Rituximab demonstrou benefício em estudos fase III.',
+    aprovadoDiretor: 'sim',
     farmacoId: 'rituximab',
     dosagem: '375mg/m²',
     posologia: 'q4w x 8',
@@ -178,7 +247,26 @@ export const pedidosIniciais: Pedido[] = [
     estado: 'agenda-cft',
     dataSubmissao: new Date(2025, 0, 15),
     dataUltimaAtualizacao: new Date(2025, 0, 25),
-    doente: { iniciais: 'APS', idade: 48, peso: 82, ecog: 0, diagnostico: 'Cancro da mama HER2+ metastático' },
+    medicoNomeCompleto: 'Dr. Pedro Santos',
+    medicoTelemovel: '914567890',
+    emailDiretor: 'diretor.oncologia@ulssjoao.min-saude.pt',
+    doente: { 
+      ndDoente: '345678',
+      iniciais: 'APS', 
+      peso: 82, 
+      altura: 168,
+      ecog: 0, 
+      indicacaoTerapeutica: 'Cancro da mama HER2+ metastático - 1ª linha',
+      diagnostico: 'Cancro da mama HER2+ metastático'
+    },
+    terapeuticaProposta: 'Protocolo CLEOPATRA (Trastuzumab + Pertuzumab + Docetaxel)',
+    linhaTratamento: '1',
+    historiaTerapeuticaPrevia: 'Sem tratamento prévio para doença metastática',
+    resumoClinico: 'Protocolo CLEOPATRA. Doente HER2+ metastático, 1ª linha. Combinação com Pertuzumab e Docetaxel.',
+    aprovadoDiretor: 'sim',
+    protocoloNOC: {
+      nomeProtocolo: 'Protocolo CLEOPATRA - Cancro da mama HER2+ metastático'
+    },
     farmacoId: 'trastuzumab',
     dosagem: '6mg/kg',
     posologia: 'q3w',
@@ -192,7 +280,7 @@ export const pedidosIniciais: Pedido[] = [
     historico: [
       { data: new Date(2025, 0, 15), estado: 'submetido', observacao: 'Pedido submetido' },
       { data: new Date(2025, 0, 17), estado: 'em-triagem', observacao: 'Triagem iniciada' },
-      { data: new Date(2025, 0, 25), estado: 'agenda-cft', observacao: 'Agendado para reunião CFT de 05/02/2025' }
+      { data: new Date(2025, 0, 25), estado: 'agenda-cft', observacao: 'Agendado para reunião CFT de 03/02/2026' }
     ]
   },
   {
@@ -202,7 +290,23 @@ export const pedidosIniciais: Pedido[] = [
     estado: 'aprovado',
     dataSubmissao: new Date(2025, 0, 5),
     dataUltimaAtualizacao: new Date(2025, 0, 20),
-    doente: { iniciais: 'RSL', idade: 70, peso: 65, ecog: 1, diagnostico: 'Melanoma maligno metastático - BRAF wild-type' },
+    medicoNomeCompleto: 'Dra. Ana Ferreira',
+    medicoTelemovel: '915678901',
+    emailDiretor: 'diretor.dermatologia@ulssjoao.min-saude.pt',
+    doente: { 
+      ndDoente: '456789',
+      iniciais: 'RSL', 
+      peso: 65, 
+      altura: 170,
+      ecog: 1, 
+      indicacaoTerapeutica: 'Melanoma maligno metastático - BRAF wild-type - 1ª linha',
+      diagnostico: 'Melanoma maligno metastático - BRAF wild-type'
+    },
+    terapeuticaProposta: 'Nivolumab',
+    linhaTratamento: '1',
+    historiaTerapeuticaPrevia: 'Sem tratamento prévio para doença metastática',
+    resumoClinico: 'Melanoma metastático irressecável, 1ª linha. Sem mutação BRAF. Indicação aprovada.',
+    aprovadoDiretor: 'sim',
     farmacoId: 'nivolumab',
     dosagem: '240mg',
     posologia: 'q2w',
@@ -213,6 +317,7 @@ export const pedidosIniciais: Pedido[] = [
     impacto: { custoMensal: 4360, custoTotal: 104640, custoAteAno: 50680 },
     justificacao: 'Melanoma metastático irressecável, 1ª linha. Sem mutação BRAF. Indicação aprovada.',
     decisaoCFT: 'favoravel',
+    fundamentacaoCFT: 'Pedido em conformidade com as indicações aprovadas. Parecer favorável unânime.',
     historico: [
       { data: new Date(2025, 0, 5), estado: 'submetido', observacao: 'Pedido submetido' },
       { data: new Date(2025, 0, 8), estado: 'em-triagem', observacao: 'Triagem iniciada' },
@@ -227,7 +332,23 @@ export const pedidosIniciais: Pedido[] = [
     estado: 'pendente-info',
     dataSubmissao: new Date(2025, 0, 22),
     dataUltimaAtualizacao: new Date(2025, 0, 26),
-    doente: { iniciais: 'CMB', idade: 58, peso: 72, ecog: 2, diagnostico: 'Carcinoma colorrectal metastático - RAS wild-type' },
+    medicoNomeCompleto: 'Dr. Carlos Mendes',
+    medicoTelemovel: '916789012',
+    emailDiretor: 'diretor.gastroenterologia@ulssjoao.min-saude.pt',
+    doente: { 
+      ndDoente: '567890',
+      iniciais: 'CMB', 
+      peso: 72, 
+      altura: 178,
+      ecog: 2, 
+      indicacaoTerapeutica: 'Carcinoma colorrectal metastático - RAS wild-type - 2ª linha',
+      diagnostico: 'Carcinoma colorrectal metastático - RAS wild-type'
+    },
+    terapeuticaProposta: 'Cetuximab',
+    linhaTratamento: '2',
+    historiaTerapeuticaPrevia: 'FOLFOX x8 ciclos com progressão',
+    resumoClinico: 'CCR metastático RAS wt, 2ª linha após progressão com FOLFOX.',
+    aprovadoDiretor: 'sim',
     farmacoId: 'cetuximab',
     dosagem: '500mg/m²',
     posologia: 'q2w',
