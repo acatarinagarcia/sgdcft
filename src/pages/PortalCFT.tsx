@@ -297,10 +297,10 @@ export default function PortalCFT() {
             <Button variant="outline" onClick={() => setDialogAberto(false)}>
               Cancelar
             </Button>
-            <Button 
+            <Button
               onClick={handleConfirmarDeliberacao}
               disabled={!decisao}
-              className="gradient-cft"
+              className="gradient-cft text-white"
             >
               Confirmar Decisão
             </Button>
@@ -329,7 +329,7 @@ function PedidoAgendaCard({ pedido, numero, onDeliberar }: { pedido: Pedido; num
               <p className="text-sm text-muted-foreground">{tipoPedido?.nome}</p>
             </div>
           </div>
-          <Button onClick={onDeliberar} className="gradient-cft">
+          <Button onClick={onDeliberar} className="gradient-cft text-white">
             Deliberar
           </Button>
         </div>

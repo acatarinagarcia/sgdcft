@@ -329,15 +329,15 @@ function PedidoTriagemCard({ pedido, onIniciarTriagem, onAgendar, onPedirInfo, o
         {/* Ações */}
         <div className="flex flex-wrap gap-2 pt-2 border-t">
           {pedido.estado === 'submetido' && (
-            <Button onClick={onIniciarTriagem} className="gradient-farmacia">
+            <Button onClick={onIniciarTriagem} className="gradient-farmacia text-white">
               <Search className="mr-2 h-4 w-4" />
               Iniciar Triagem
             </Button>
           )}
-          
+
           {pedido.estado === 'em-triagem' && (
             <>
-              <Button onClick={onAgendar} className="gradient-cft">
+              <Button onClick={onAgendar} className="gradient-cft text-white">
                 <Calendar className="mr-2 h-4 w-4" />
                 Agendar CFT
               </Button>
