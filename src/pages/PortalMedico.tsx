@@ -332,7 +332,7 @@ export default function PortalMedico() {
                 {/* Botão de submissão */}
                 {tipoPedido && (
                   <div className="flex justify-end pt-4">
-                    <Button type="submit" className="gradient-medico hover:opacity-90" size="lg">
+                    <Button type="submit" className="gradient-medico text-white hover:opacity-90" size="lg">
                       <Plus className="mr-2 h-5 w-5" />
                       Submeter Pedido
                     </Button>
