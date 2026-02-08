@@ -259,7 +259,7 @@ export default function PortalCFT() {
             <div className="grid grid-cols-3 gap-3">
               <Button
                 variant={decisao === 'favoravel' ? 'default' : 'outline'}
-                className={decisao === 'favoravel' ? 'bg-green-600 hover:bg-green-700' : ''}
+                className={decisao === 'favoravel' ? 'bg-green-600 hover:bg-green-700 text-white' : ''}
                 onClick={() => setDecisao('favoravel')}
               >
                 <CheckCircle className="mr-2 h-4 w-4" />
@@ -267,7 +267,7 @@ export default function PortalCFT() {
               </Button>
               <Button
                 variant={decisao === 'desfavoravel' ? 'default' : 'outline'}
-                className={decisao === 'desfavoravel' ? 'bg-red-600 hover:bg-red-700' : ''}
+                className={decisao === 'desfavoravel' ? 'bg-red-600 hover:bg-red-700 text-white' : ''}
                 onClick={() => setDecisao('desfavoravel')}
               >
                 <XCircle className="mr-2 h-4 w-4" />
@@ -275,7 +275,7 @@ export default function PortalCFT() {
               </Button>
               <Button
                 variant={decisao === 'adiado' ? 'default' : 'outline'}
-                className={decisao === 'adiado' ? 'bg-amber-600 hover:bg-amber-700' : ''}
+                className={decisao === 'adiado' ? 'bg-amber-600 hover:bg-amber-700 text-white' : ''}
                 onClick={() => setDecisao('adiado')}
               >
                 <RotateCcw className="mr-2 h-4 w-4" />
@@ -300,7 +300,7 @@ export default function PortalCFT() {
             <Button
               onClick={handleConfirmarDeliberacao}
               disabled={!decisao}
-              className="gradient-cft text-white"
+              className={decisao ? 'gradient-cft text-white' : ''}
             >
               Confirmar Decisão
             </Button>

@@ -215,10 +215,10 @@ export default function PortalFarmacia() {
             <Button variant="outline" onClick={() => setDialogAberto(false)}>
               Cancelar
             </Button>
-            <Button 
+            <Button
               onClick={handleConfirmarAcao}
               disabled={acaoDialog === 'agendar' && !reuniaoSelecionada}
-              className="gradient-farmacia"
+              className={acaoDialog === 'agendar' && !reuniaoSelecionada ? '' : 'gradient-farmacia text-white'}
             >
               Confirmar
             </Button>
