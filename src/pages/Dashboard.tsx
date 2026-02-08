@@ -65,8 +65,8 @@ export default function Dashboard() {
           <div className="flex items-center gap-3">
             <Activity className="h-8 w-8" />
             <div>
-              <h1 className="text-2xl font-bold">SGT-CFT</h1>
-              <p className="text-sm text-white/60">Sistema de Gestão Terapêutica</p>
+              <h1 className="text-2xl font-bold">SGD-CFT</h1>
+              <p className="text-sm text-white/60">Sistema de Gestão Documental - Comissão de Farmácia e Terapêutica</p>
             </div>
           </div>
         </div>
@@ -251,7 +251,7 @@ export default function Dashboard() {
       {/* Footer */}
       <footer className="border-t border-white/10 py-6 mt-8">
         <div className="container mx-auto px-4 text-center text-white/40 text-sm">
-          SGT-CFT © 2025 • Sistema de Gestão Terapêutica - Demonstração
+          SGD-CFT © 2025 • Sistema de Gestão Documental - Comissão de Farmácia e Terapêutica - Demonstração
         </div>
       </footer>
     </div>

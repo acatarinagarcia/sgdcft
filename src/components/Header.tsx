@@ -21,7 +21,7 @@ export function Header() {
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <Activity className="h-6 w-6 text-primary" />
-            <span className="font-bold text-lg">SGT-CFT</span>
+            <span className="font-bold text-lg">SGD-CFT</span>
           </Link>
 
           <nav className="flex items-center gap-1">
