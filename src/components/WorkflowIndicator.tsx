@@ -1,4 +1,4 @@
-import { ArrowRight, FileText, Search, Calendar, CheckCircle } from 'lucide-react';
+import { ArrowRight, FileText, Search, ClipboardCheck, Calendar, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { EstadoPedido } from '@/lib/data';
 
@@ -10,13 +10,14 @@ interface WorkflowIndicatorProps {
 const etapas = [
   { id: 'submetido', label: 'Submissão', icon: FileText },
   { id: 'em-triagem', label: 'Triagem', icon: Search },
+  { id: 'parecer-farmacia', label: 'Parecer Farmácia', icon: ClipboardCheck },
   { id: 'agenda-cft', label: 'Agenda CFT', icon: Calendar },
   { id: 'aprovado', label: 'Deliberação', icon: CheckCircle },
 ];
 
 export function WorkflowIndicator({ estadoAtual, className }: WorkflowIndicatorProps) {
   const getEtapaIndex = (estado: EstadoPedido): number => {
-    if (estado === 'rejeitado') return 3;
+    if (estado === 'rejeitado') return 4;
     if (estado === 'pendente-info' || estado === 'encaminhado-dc') return 1;
     return etapas.findIndex(e => e.id === estado);
   };

@@ -44,6 +44,7 @@ export const circuitos = [
 export type EstadoPedido = 
   | 'submetido' 
   | 'em-triagem' 
+  | 'parecer-farmacia'
   | 'agenda-cft' 
   | 'aprovado' 
   | 'rejeitado' 
@@ -53,6 +54,7 @@ export type EstadoPedido =
 export const estados: Record<EstadoPedido, { nome: string; cor: string; descricao: string }> = {
   'submetido': { nome: 'Submetido', cor: 'bg-blue-500', descricao: 'Aguarda triagem farmacêutica' },
   'em-triagem': { nome: 'Em Triagem', cor: 'bg-amber-500', descricao: 'Em análise pela farmácia' },
+  'parecer-farmacia': { nome: 'Parecer Farmácia', cor: 'bg-cyan-500', descricao: 'Parecer técnico da farmácia emitido' },
   'agenda-cft': { nome: 'Agenda CFT', cor: 'bg-purple-500', descricao: 'Agendado para reunião CFT' },
   'aprovado': { nome: 'Aprovado', cor: 'bg-green-500', descricao: 'Pedido aprovado pelo CA' },
   'rejeitado': { nome: 'Rejeitado', cor: 'bg-red-500', descricao: 'Pedido não aprovado' },
