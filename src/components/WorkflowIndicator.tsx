@@ -40,7 +40,7 @@ export function WorkflowIndicator({ estadoAtual, className }: WorkflowIndicatorP
                   isCompleted && 'bg-green-500 text-white',
                   isCurrent && !isRejected && 'bg-primary text-primary-foreground ring-4 ring-primary/20',
                   isRejected && 'bg-red-500 text-white',
-                  !isCompleted && !isCurrent && 'bg-muted text-muted-foreground'
+                  !isCompleted && !isCurrent && 'bg-background text-muted-foreground border border-border'
                 )}
               >
                 <Icon className="h-5 w-5" />
