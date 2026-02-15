@@ -33,12 +33,10 @@ export function Passo1Identificacao({ data, onChange }: Passo1Props) {
 
   // Mock SONHO validation
   const validarND = (nd: string) => {
-    updateDoente('ndDoente', nd);
-    if (nd.length >= 4) {
-      updateDoente('validado', true);
-    } else {
-      updateDoente('validado', false);
-    }
+    onChange({
+      ...data,
+      doente: { ...data.doente, ndDoente: nd, validado: nd.length >= 4 },
+    });
   };
 
   return (
@@ -170,13 +168,15 @@ export function Passo1Identificacao({ data, onChange }: Passo1Props) {
                     id="doente-externo"
                     checked={data.doente.doenteExterno}
                     onCheckedChange={(checked) => {
-                      updateDoente('doenteExterno', !!checked);
-                      if (checked) {
-                        updateDoente('validado', true);
-                        updateDoente('ndDoente', '');
-                      } else {
-                        updateDoente('validado', false);
-                      }
+                      onChange({
+                        ...data,
+                        doente: {
+                          ...data.doente,
+                          doenteExterno: !!checked,
+                          validado: !!checked,
+                          ndDoente: checked ? '' : data.doente.ndDoente,
+                        },
+                      });
                     }}
                   />
                   <div>
