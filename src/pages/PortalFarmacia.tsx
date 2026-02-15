@@ -3,34 +3,23 @@ import { Header } from '@/components/Header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { StatusBadge } from '@/components/StatusBadge';
 import { WorkflowIndicator } from '@/components/WorkflowIndicator';
 import { usePedidos } from '@/context/PedidosContext';
-import { farmacos, servicos, tiposPedido, reunioesCFT, Pedido, EstadoPedido } from '@/lib/data';
+import { farmacos, servicos, tiposPedido, reunioesCFT, setoresSFA, Pedido, EstadoPedido } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { 
-  Pill, 
-  Search,
-  Calendar,
-  ArrowRight,
-  Clock,
-  FileText,
-  User,
-  Euro,
-  AlertCircle,
-  CheckCircle,
-  Send,
-  Building
+  Pill, Search, Calendar, Clock, User, Euro, AlertCircle, Send, Building, Shield, Truck
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { pt } from 'date-fns/locale';
 
 type FiltroEstado = 'todos' | 'submetido' | 'em-triagem' | 'pendente-info';
+type AcaoDialog = 'agendar' | 'info' | 'dc' | 'ces' | 'sfa';
 
 export default function PortalFarmacia() {
   const { toast } = useToast();
@@ -38,19 +27,16 @@ export default function PortalFarmacia() {
   const [filtro, setFiltro] = useState<FiltroEstado>('todos');
   const [pedidoSelecionado, setPedidoSelecionado] = useState<Pedido | null>(null);
   const [reuniaoSelecionada, setReuniaoSelecionada] = useState('');
+  const [setorSFA, setSetorSFA] = useState('');
   const [observacao, setObservacao] = useState('');
   const [dialogAberto, setDialogAberto] = useState(false);
-  const [acaoDialog, setAcaoDialog] = useState<'agendar' | 'info' | 'dc'>('agendar');
+  const [acaoDialog, setAcaoDialog] = useState<AcaoDialog>('agendar');
 
-  // Filtrar pedidos para triagem
   const pedidosFiltrados = pedidos.filter(p => {
-    if (filtro === 'todos') {
-      return ['submetido', 'em-triagem', 'pendente-info'].includes(p.estado);
-    }
+    if (filtro === 'todos') return ['submetido', 'em-triagem', 'pendente-info'].includes(p.estado);
     return p.estado === filtro;
   });
 
-  // Contadores
   const contadores = {
     todos: pedidos.filter(p => ['submetido', 'em-triagem', 'pendente-info'].includes(p.estado)).length,
     submetido: pedidos.filter(p => p.estado === 'submetido').length,
@@ -62,16 +48,14 @@ export default function PortalFarmacia() {
 
   const handleIniciarTriagem = (pedido: Pedido) => {
     atualizarEstado(pedido.id, 'em-triagem', 'Triagem iniciada pela farmácia');
-    toast({
-      title: 'Triagem iniciada',
-      description: `Pedido ${pedido.codigo} está agora em triagem.`,
-    });
+    toast({ title: 'Triagem iniciada', description: `Pedido ${pedido.codigo} está agora em triagem.` });
   };
 
-  const handleAbrirDialog = (pedido: Pedido, acao: 'agendar' | 'info' | 'dc') => {
+  const handleAbrirDialog = (pedido: Pedido, acao: AcaoDialog) => {
     setPedidoSelecionado(pedido);
     setAcaoDialog(acao);
     setReuniaoSelecionada('');
+    setSetorSFA('');
     setObservacao('');
     setDialogAberto(true);
   };
@@ -79,35 +63,57 @@ export default function PortalFarmacia() {
   const handleConfirmarAcao = () => {
     if (!pedidoSelecionado) return;
 
-    if (acaoDialog === 'agendar' && reuniaoSelecionada) {
-      agendarCFT(pedidoSelecionado.id, reuniaoSelecionada);
-      const reuniao = reunioesCFT.find(r => r.id === reuniaoSelecionada);
-      toast({
-        title: 'Pedido agendado',
-        description: `Agendado para CFT de ${reuniao ? format(reuniao.data, "d 'de' MMMM", { locale: pt }) : ''}`,
-      });
-    } else if (acaoDialog === 'info') {
-      atualizarEstado(pedidoSelecionado.id, 'pendente-info', observacao || 'Solicitada informação adicional ao médico');
-      toast({
-        title: 'Informação solicitada',
-        description: 'O médico será notificado para fornecer informação adicional.',
-      });
-    } else if (acaoDialog === 'dc') {
-      atualizarEstado(pedidoSelecionado.id, 'encaminhado-dc', observacao || 'Encaminhado para aprovação da Direção Clínica');
-      toast({
-        title: 'Encaminhado',
-        description: 'Pedido encaminhado para Direção Clínica.',
-      });
+    switch (acaoDialog) {
+      case 'agendar':
+        if (!reuniaoSelecionada) return;
+        agendarCFT(pedidoSelecionado.id, reuniaoSelecionada);
+        const reuniao = reunioesCFT.find(r => r.id === reuniaoSelecionada);
+        toast({
+          title: 'Pedido agendado',
+          description: `Agendado para CFT de ${reuniao ? format(reuniao.data, "d 'de' MMMM", { locale: pt }) : ''}`,
+        });
+        break;
+      case 'info':
+        atualizarEstado(pedidoSelecionado.id, 'pendente-info', observacao || 'Solicitada informação adicional ao médico');
+        toast({ title: 'Informação solicitada', description: 'O médico será notificado para fornecer informação adicional.' });
+        break;
+      case 'dc':
+        atualizarEstado(pedidoSelecionado.id, 'encaminhado-dc', observacao || 'Encaminhado para aprovação da Direção Clínica');
+        toast({ title: 'Encaminhado DC', description: 'Pedido encaminhado para Direção Clínica.' });
+        break;
+      case 'ces':
+        atualizarEstado(pedidoSelecionado.id, 'encaminhado-ces', observacao || 'Encaminhado para Comissão de Ética para a Saúde');
+        toast({ title: 'Encaminhado CES', description: 'Pedido encaminhado para a Comissão de Ética.' });
+        break;
+      case 'sfa':
+        if (!setorSFA) return;
+        const setor = setoresSFA.find(s => s.id === setorSFA);
+        atualizarEstado(pedidoSelecionado.id, 'encaminhado-sfa', observacao || `Encaminhado para SFA - ${setor?.nome || setorSFA}`);
+        toast({ title: 'Encaminhado SFA', description: `Pedido encaminhado para ${setor?.nome}.` });
+        break;
     }
 
     setDialogAberto(false);
     setPedidoSelecionado(null);
   };
 
+  const dialogTitles: Record<AcaoDialog, string> = {
+    agendar: 'Agendar para Reunião CFT',
+    info: 'Solicitar Informação Adicional',
+    dc: 'Encaminhar Circuito Paralelo — Direção Clínica',
+    ces: 'Encaminhar Circuito Paralelo — Comissão de Ética (CES)',
+    sfa: 'Encaminhar para Serviços Farmacêuticos (SFA)',
+  };
+
+  const isConfirmDisabled = () => {
+    if (acaoDialog === 'agendar') return !reuniaoSelecionada;
+    if (acaoDialog === 'sfa') return !setorSFA;
+    return false;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
@@ -124,18 +130,9 @@ export default function PortalFarmacia() {
         {/* Filtros */}
         <div className="flex flex-wrap gap-2 mb-6">
           {(['todos', 'submetido', 'em-triagem', 'pendente-info'] as FiltroEstado[]).map(f => (
-            <Button
-              key={f}
-              variant={filtro === f ? 'default' : 'outline'}
-              onClick={() => setFiltro(f)}
-              className={filtro === f ? 'gradient-farmacia' : ''}
-            >
-              {f === 'todos' ? 'Todos' : 
-               f === 'submetido' ? 'Aguardam Triagem' :
-               f === 'em-triagem' ? 'Em Triagem' : 'Pendente Info'}
-              <Badge variant="secondary" className="ml-2 bg-white/20">
-                {contadores[f]}
-              </Badge>
+            <Button key={f} variant={filtro === f ? 'default' : 'outline'} onClick={() => setFiltro(f)} className={filtro === f ? 'gradient-farmacia' : ''}>
+              {f === 'todos' ? 'Todos' : f === 'submetido' ? 'Aguardam Triagem' : f === 'em-triagem' ? 'Em Triagem' : 'Pendente Info'}
+              <Badge variant="secondary" className="ml-2 bg-white/20">{contadores[f]}</Badge>
             </Button>
           ))}
         </div>
@@ -151,13 +148,15 @@ export default function PortalFarmacia() {
             </Card>
           ) : (
             pedidosFiltrados.map(pedido => (
-              <PedidoTriagemCard 
-                key={pedido.id} 
+              <PedidoTriagemCard
+                key={pedido.id}
                 pedido={pedido}
                 onIniciarTriagem={() => handleIniciarTriagem(pedido)}
                 onAgendar={() => handleAbrirDialog(pedido, 'agendar')}
                 onPedirInfo={() => handleAbrirDialog(pedido, 'info')}
                 onEncaminharDC={() => handleAbrirDialog(pedido, 'dc')}
+                onEncaminharCES={() => handleAbrirDialog(pedido, 'ces')}
+                onEncaminharSFA={() => handleAbrirDialog(pedido, 'sfa')}
               />
             ))
           )}
@@ -168,14 +167,8 @@ export default function PortalFarmacia() {
       <Dialog open={dialogAberto} onOpenChange={setDialogAberto}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {acaoDialog === 'agendar' && 'Agendar para Reunião CFT'}
-              {acaoDialog === 'info' && 'Solicitar Informação Adicional'}
-              {acaoDialog === 'dc' && 'Encaminhar para Direção Clínica'}
-            </DialogTitle>
-            <DialogDescription>
-              Pedido: {pedidoSelecionado?.codigo}
-            </DialogDescription>
+            <DialogTitle>{dialogTitles[acaoDialog]}</DialogTitle>
+            <DialogDescription>Pedido: {pedidoSelecionado?.codigo}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
@@ -183,9 +176,7 @@ export default function PortalFarmacia() {
               <div>
                 <Label>Selecione a Reunião</Label>
                 <Select value={reuniaoSelecionada} onValueChange={setReuniaoSelecionada}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Escolha uma data" />
-                  </SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Escolha uma data" /></SelectTrigger>
                   <SelectContent>
                     {reunioesDisponiveis.map(r => (
                       <SelectItem key={r.id} value={r.id}>
@@ -197,13 +188,30 @@ export default function PortalFarmacia() {
               </div>
             )}
 
-            {(acaoDialog === 'info' || acaoDialog === 'dc') && (
+            {acaoDialog === 'sfa' && (
+              <div>
+                <Label>Setor SFA</Label>
+                <Select value={setorSFA} onValueChange={setSetorSFA}>
+                  <SelectTrigger><SelectValue placeholder="Selecione o setor" /></SelectTrigger>
+                  <SelectContent>
+                    {setoresSFA.map(s => (
+                      <SelectItem key={s.id} value={s.id}>{s.nome}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {(acaoDialog !== 'agendar') && (
               <div>
                 <Label>Observação</Label>
                 <Textarea
-                  placeholder={acaoDialog === 'info' 
-                    ? 'Descreva a informação necessária...'
-                    : 'Motivo do encaminhamento...'}
+                  placeholder={
+                    acaoDialog === 'info' ? 'Descreva a informação necessária...' :
+                    acaoDialog === 'dc' ? 'Motivo do encaminhamento para DC...' :
+                    acaoDialog === 'ces' ? 'Motivo do encaminhamento para CES...' :
+                    'Observações para o setor SFA...'
+                  }
                   value={observacao}
                   onChange={e => setObservacao(e.target.value)}
                 />
@@ -212,16 +220,8 @@ export default function PortalFarmacia() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogAberto(false)}>
-              Cancelar
-            </Button>
-            <Button 
-              onClick={handleConfirmarAcao}
-              disabled={acaoDialog === 'agendar' && !reuniaoSelecionada}
-              className="gradient-farmacia"
-            >
-              Confirmar
-            </Button>
+            <Button variant="outline" onClick={() => setDialogAberto(false)}>Cancelar</Button>
+            <Button onClick={handleConfirmarAcao} disabled={isConfirmDisabled()} className="gradient-farmacia">Confirmar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -229,15 +229,19 @@ export default function PortalFarmacia() {
   );
 }
 
+// --- Card Component ---
+
 interface PedidoTriagemCardProps {
   pedido: Pedido;
   onIniciarTriagem: () => void;
   onAgendar: () => void;
   onPedirInfo: () => void;
   onEncaminharDC: () => void;
+  onEncaminharCES: () => void;
+  onEncaminharSFA: () => void;
 }
 
-function PedidoTriagemCard({ pedido, onIniciarTriagem, onAgendar, onPedirInfo, onEncaminharDC }: PedidoTriagemCardProps) {
+function PedidoTriagemCard({ pedido, onIniciarTriagem, onAgendar, onPedirInfo, onEncaminharDC, onEncaminharCES, onEncaminharSFA }: PedidoTriagemCardProps) {
   const farmaco = farmacos.find(f => f.id === pedido.farmacoId);
   const servico = servicos.find(s => s.id === pedido.servicoId);
   const tipoPedido = tiposPedido.find(t => t.id === pedido.tipo);
@@ -271,24 +275,19 @@ function PedidoTriagemCard({ pedido, onIniciarTriagem, onAgendar, onPedirInfo, o
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Informações principais */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
           <div className="flex items-start gap-2">
             <User className="h-4 w-4 text-muted-foreground mt-0.5" />
             <div>
               <p className="text-muted-foreground">Doente</p>
-              <p className="font-medium">
-                {pedido.doente.ndDoente || pedido.doente.iniciais} • {pedido.doente.peso}kg • ECOG {pedido.doente.ecog}
-              </p>
+              <p className="font-medium">{pedido.doente.ndDoente || pedido.doente.iniciais} • {pedido.doente.peso}kg • ECOG {pedido.doente.ecog}</p>
             </div>
           </div>
           <div className="flex items-start gap-2">
             <Pill className="h-4 w-4 text-muted-foreground mt-0.5" />
             <div>
               <p className="text-muted-foreground">Terapêutica Proposta</p>
-              <p className="font-medium">
-                {pedido.terapeuticaProposta || (farmaco?.nome ? `${farmaco.nome} ${pedido.dosagem || ''} ${pedido.posologia || ''}` : '-')}
-              </p>
+              <p className="font-medium">{pedido.terapeuticaProposta || (farmaco?.nome ? `${farmaco.nome} ${pedido.dosagem || ''} ${pedido.posologia || ''}` : '-')}</p>
             </div>
           </div>
           <div className="flex items-start gap-2">
@@ -303,15 +302,12 @@ function PedidoTriagemCard({ pedido, onIniciarTriagem, onAgendar, onPedirInfo, o
               <Euro className="h-4 w-4 text-muted-foreground mt-0.5" />
               <div>
                 <p className="text-muted-foreground">Impacto Mensal</p>
-                <p className="font-medium">
-                  {new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(pedido.impacto.custoMensal)}
-                </p>
+                <p className="font-medium">{new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(pedido.impacto.custoMensal)}</p>
               </div>
             </div>
           )}
         </div>
 
-        {/* Indicação e Resumo Clínico */}
         <div className="p-4 rounded-lg bg-muted/50 space-y-3">
           <div>
             <p className="text-sm font-medium text-muted-foreground">Indicação Terapêutica</p>
@@ -323,7 +319,6 @@ function PedidoTriagemCard({ pedido, onIniciarTriagem, onAgendar, onPedirInfo, o
           </div>
         </div>
 
-        {/* Workflow */}
         <WorkflowIndicator estadoAtual={pedido.estado} />
 
         {/* Ações */}
@@ -347,7 +342,15 @@ function PedidoTriagemCard({ pedido, onIniciarTriagem, onAgendar, onPedirInfo, o
               </Button>
               <Button variant="outline" onClick={onEncaminharDC}>
                 <Send className="mr-2 h-4 w-4" />
-                Encaminhar DC
+                Circuito Paralelo DC
+              </Button>
+              <Button variant="outline" onClick={onEncaminharCES}>
+                <Shield className="mr-2 h-4 w-4" />
+                Circuito Paralelo CES
+              </Button>
+              <Button variant="outline" onClick={onEncaminharSFA}>
+                <Truck className="mr-2 h-4 w-4" />
+                Encaminhar SFA
               </Button>
             </>
           )}

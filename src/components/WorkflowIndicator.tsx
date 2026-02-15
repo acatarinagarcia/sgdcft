@@ -18,7 +18,7 @@ const etapas = [
 export function WorkflowIndicator({ estadoAtual, className }: WorkflowIndicatorProps) {
   const getEtapaIndex = (estado: EstadoPedido): number => {
     if (estado === 'rejeitado') return 4;
-    if (estado === 'pendente-info' || estado === 'encaminhado-dc') return 1;
+    if (estado === 'pendente-info' || estado === 'encaminhado-dc' || estado === 'encaminhado-ces' || estado === 'encaminhado-sfa') return 1;
     return etapas.findIndex(e => e.id === estado);
   };
 

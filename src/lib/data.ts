@@ -49,7 +49,9 @@ export type EstadoPedido =
   | 'aprovado' 
   | 'rejeitado' 
   | 'pendente-info'
-  | 'encaminhado-dc';
+  | 'encaminhado-dc'
+  | 'encaminhado-ces'
+  | 'encaminhado-sfa';
 
 export const estados: Record<EstadoPedido, { nome: string; cor: string; descricao: string }> = {
   'submetido': { nome: 'Submetido', cor: 'bg-blue-500', descricao: 'Aguarda triagem farmacêutica' },
@@ -60,7 +62,18 @@ export const estados: Record<EstadoPedido, { nome: string; cor: string; descrica
   'rejeitado': { nome: 'Rejeitado', cor: 'bg-red-500', descricao: 'Pedido não aprovado' },
   'pendente-info': { nome: 'Pendente Info', cor: 'bg-orange-500', descricao: 'Aguarda informação adicional' },
   'encaminhado-dc': { nome: 'Direção Clínica', cor: 'bg-indigo-500', descricao: 'Encaminhado para direção clínica' },
+  'encaminhado-ces': { nome: 'CES', cor: 'bg-rose-500', descricao: 'Encaminhado para Comissão de Ética' },
+  'encaminhado-sfa': { nome: 'SFA', cor: 'bg-teal-500', descricao: 'Encaminhado para Serviços Farmacêuticos' },
 };
+
+// Setores SFA
+export const setoresSFA = [
+  { id: 'hdia', nome: 'Hospital de Dia (HDIA)' },
+  { id: 'internamento', nome: 'Internamento' },
+  { id: 'ambulatorio', nome: 'Ambulatório' },
+  { id: 'umc', nome: 'Unidade de Misturas Citotóxicas (UMC)' },
+  { id: 'ucpc', nome: 'Unidade Centralizada de Preparação de Citotóxicos (UCPC)' },
+];
 
 // Reuniões CFT
 export interface ReuniaoCFT {
